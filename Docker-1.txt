@@ -1,0 +1,3289 @@
+Docker
+===================
+
+Virtaulization
+===================
+	Here we a have a baremetal (H/W) on which we install the 
+host OS and on the host OS we install an application  called as
+hypervisor,on this hypervisor we can install guest OS and on the
+guest OS we can run the s/w applications that we want
+This technology enables us to run multiple OS's parallely on one
+server.
+The disdavantage is these applications have to pass through so many 
+layers in order to access the H/W resources.
+Similary each VM requires fixed amout of H/W to be allocated
+
+
+Containarization
+==========================
+	Here we have a bare metal on top of which we install the host
+OS and on the host OS we install an application called as Docker Engine
+On this docker  engine we can run any application in the form of container
+These containers are extrememly light weight and consume very less amount
+of H/W resources.They can be created very quickly comared to VM's
+
+Docker is used for "process isolation" ie the depndency that an application 
+has on an OS is removed and they can directly run on top of docker engine.
+The advantage is we nedd not spend money on licensing of the OS's
+Docker can be used at all the below stages of s/w development
+Build--->Ship--->Run
+
+Installing docker on Windows
+======================================
+1 Open https://docs.docker.com/docker-for-windows/install/
+2 Download docker fow windows---->Install it
+3 To execute docker command use "PowerShell"
+
+Note: Docker can be installed on on Windows 10 Prof 64 bit version 
+or Windows 2016 Server edition
+
+Note: Once docker is installed on Windows it activates an application
+called Windows hypervisor(HyperV).Once this is activated it will not allow
+any other virtualization s/w to run
+
+
+Installing docker on Linux
+=================================
+1 Open get.docker.com
+2 Copy and paste the below 2 commands
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+
+sh get-docker.sh
+
+
+============================================================================
+Day 3
+============================================================================
+
+
+Images and Containers
+============================
+A docker image is a collections of binaries and libraires that
+are necessary for a s/w application to work
+
+A running instances of an image is called as a container.
+Any numbe rof containers can be created from one docker image
+
+Docker host: The server where docker is installed is called
+as docker host
+
+Docker Client: This is a background process which is responsible
+for accepting the docker command from the user and it will pass
+these command to another background process called as docker deamon
+
+Docker deamon: This is responsible for accepting the commands from the
+docker client and it will route thsoe commands to work on either docker
+images or containers or on the docker registry
+
+Docker registry: This is the location where docker images are stored
+This is of 2 type
+1 Public registry
+2 Private registry
+
+Public registry is hub.docker.com and it is maintanied by the docker corporation
+Private registry is set up on our servers and only our team members will be able
+to access thei registry
+
+
+Working on docker images
+================================
+1 To download a docker image
+  docker pull image_name
+
+2 To search for an image
+  docker search image_name
+
+3 To delete the docker image
+  docker rmi image_name/image_id
+
+4 To upload an image into docker hub(registry)
+  docker push image_name
+
+5 To get detailed info about a docker image
+  docker image insepct image_name/image_id
+
+6 To see the list of images present on our dockerhost
+  docker images (or) docker image ls
+
+7 To create an image from a customised container
+  docker commit container_id/container_name new_image_name
+
+8 To create an image from the docker file
+  docker build -t image_name .
+
+9 To delete all the images
+  docker system prune -af
+
+10 To save the docker image as a tar file
+   docker image save image_name
+
+11 To untar the above file and create images
+   docker image load tarfile
+
+12 To see the complete version history for an image
+   docker image history image_name/image_id
+======================================================================
+Day 4
+=============================================================================
+13 To start a stoped container
+   docker start container_name/container_id
+
+14 To restart a container
+   docker restart container_name/container_id
+   To restart after 10 seconds
+   docker restart -t 10 container_name/container_id
+
+15 To stop a running container
+   docker stop container_name/container_id
+
+16 To delete a stoped container
+   docker rm container_name/container_id
+
+17 To delete a running container
+   docker rm -f container_name/container_id
+
+18 To stop all the running containers
+   docker stop $(docker ps -aq)
+
+19 To delete all the stopped containers
+   docker rm $(docker ps -aq)
+
+20 To delete all containers (running and stopped)
+   docker rm -f $(docker ps -aq)
+
+21 To see the list of all running containers
+   docker container ls
+
+22 To see all containers (running and stopped)
+   docker ps -a
+
+23 To see the logs generated by a container
+   docker logs container_name/container_id
+
+24 To view the ports used by container
+   docker port container_name/container_id
+
+25 To get detailed info about a container
+   docker inspect container_name/container_id
+
+26 To create a container 
+   docker run image_name
+   run command options  
+   --------------------------
+   --name : Used to give a name for a container
+   -d : Used to run the container in detached mode in background
+   -it : Used to open interactive terminal in the container
+   -e  : Used to pass environment variables to containers
+   -v : Used to attach a volume to a container
+   --volumes-from : Used for sharing volumes between multiple containers
+   -p : Used for port mapping.It will map the container port with the host port
+        Container port is called as internal port and host port is called as
+        external port Eg: -p 8080:80 Here 8080 is host port and 80 is container port
+   -P : Used for automatic port mapping it will map the container port with 
+        a host port that is greater than 30000
+   --network: Used to run a container on a particaular network
+   --link: Used for linking of containers
+   -c : Used to specify how much CPU can be used by container
+   -m : Used to specify how much memory can be used by container
+   -rm : Used for deleting a container on exit
+
+
+==============================================================================
+Day 5
+==============================================================================
+
+27 To come out of a container without exit
+   ctrl+p,ctrl+q
+
+28 To run a command in a container from outside the container
+   docker exec -it container_name/container_id   command
+   Eg: To open a bash shell in the container
+   docker exec -it container_name/container_id  bash
+
+29 To go back into a container where the interactive terminal is present
+   docker attach container_name/container_id
+
+======================================================================
+
+UseCase 1
+Create a nginx container and detached mode and also perform port mapping
+docker run --name webserver -d -p 8888:80 nginx
+
+To see the list of containers
+docker container ls
+
+To access nginx from the level of browser
+public_ip_of_dockerhost:8888
+
+==========================================================================
+UseCase 2
+Create a httpd container in detached modes and perform automatic port mapping
+docker run --name appserver -d -P httpd
+
+To see the port used by the above container
+docker port appserver
+
+To access the httpd application from browser
+public_ip_of_dockerhost:port_no_from_above command
+
+============================================================================
+UseCase 3
+Create a centos container and go into interactive terminal of the container
+docker run --name mycnetos -it centos
+
+To come out of the terminal of the centos container
+exit
+
+==============================================================================
+UseCase 4
+Create a postgres database and also pass the necessary environment variables
+docker run --name db -d -e POSTGRES_PASSWORD=intelliqt postgres
+
+To check if the postgre db  container is running
+docker container ls
+
+===============================================================================
+UseCase 5
+Create a mysql database and login as root user and create some tables
+docker run  --name mydb -d -e MYSQL_ROOT_PASSWORD=intelliqit mysql:5
+
+To launch the shell of the above container
+docker exec -it mydb bash
+
+To login as database root user
+mysql -u root -p
+Password: intelliqit
+
+To see the list of databases
+show databases;
+
+To move into any one of the above database
+use sys;
+
+To create emp and dept tables here
+Open https://justinsomnia.org/2009/04/the-emp-and-dept-tables-for-mysql/
+Copy the code for creating emp and dept tables and paste in mysql container
+
+To see the content of the tables
+select * from emp;
+select * from dept;
+
+===================================================================
+Day 6
+===================================================================
+
+Creating multi container architectures
+===========================================
+Multiple containers can be linked with each other to create
+a multi container or micro services architecture
+This can be done in the following ways
+
+1  --link 
+2  Docker compose
+3 Docker Networking
+
+4 Python Scripts
+
+--link Option
+====================
+This is a docker run command option and it is "depricated".
+
+UseCase
+--------------
+Create 2 busybox containers and link them
+
+1 Start a busybox container
+  docker run --name c1 -it busybox
+
+2 To comoe out of the busybox c1 container without exit
+  ctrl+p,ctrl+q
+
+3 Create another busybox container and link it with the c1 container
+  docker run --name c2 -it --link c1:mybusybox busybox
+
+4 In the c2 container check if we can ping to c1
+  ping c1
+  Also check if the  entry of c1 container is added in the /etc/hosts file
+  of the c2 container
+  cat /etc/hosts
+
+==============================================================================
+UseCase 2
+Create a development environment where a mysql container is linked with
+a wordpress container
+
+1 Create a mysql container
+  docker run --name mydb -d -e MYSQL_ROOT_PASSWORD=intellqit mysql:5
+
+2 Create a wordpress container
+  docker run  --name mywordpress -d -p 8888:80 --link mydb:mysql  wordpress
+
+3 To check if wordpress container is linked with mysql
+  docker inspect wordpress
+  In the JSON output search for "Links" section
+
+4 To access the wordpress from browser
+  public_ip_of_dockerhost:8888
+
+
+========================================================================
+UseCase 3
+Create a development environment where a mysql container is linked
+with a ghost container(Blogging s/w)
+
+1 Create a mysql container
+  docker run --name mydb -d -e MYSQL_ROOT_PASSWORD=intellqit mysql:5
+
+2 Create a ghost container and link with mysql container
+  docker run --name ghost -p 9090:2368 -d --link mydb:mysql ghost
+
+3 To access the ghost application from browser
+  public_ip_of_dockerhost:9090
+
+============================================================================
+UseCase 4
+Create a CI-CD environment where a jenkins container is linked with
+2 tomcat containers one for qaserver and other for prodserver
+
+1 Create a jenkins container
+  docker run --name jenkinsserver -d -p 5050:8080 jenkins
+
+2 To access jenkins from browser
+  public_ip_of_dockerhost:5050
+
+3 Create a tomcat container for qaserver and link with jenkins contianer
+  docker run --name qaserver -d -p 6060:8080 --link jenkinsserver:jenkins tomcat
+
+4 Create another tomcat container for prodserver and link with jenkins contianer
+  docker run --name prodserver -d -p 7070:8080 --link jenkinsserver:jenkins tomcat
+
+===============================================================================
+Day 7
+================================================================================
+
+
+UseCase 1
+===============
+Create LAMP architecture using docker containers
+
+1 Create a mysql container
+  docker run  --name db -d -e MYSQL_ROOT_PASSWORD=intelliqit mysql
+
+2 Create an apache container and link with mysql container
+  docker run  --name apache -d -p 9999:80 --link db:mysql httpd
+
+3 Create a php container and link with apache and mysql container
+  docker run --name php -d --link db:mysql --link apache:httpd  php:7.2-apache
+
+4 To check if php container is linked with other 2 containers
+  docker inspect php
+  Search for "Links" section in the JSON output
+
+==========================================================================
+UseCase 2
+==================
+Creating a testing environment where a selenium hub container 
+is linked with a chrome node and firefox node
+
+1 Create a hub container
+  docker run --name hub -d -p 4444:4444 selenium/hub 
+
+2 Create a chrome container and link with the hub container
+  docker run --name chrome -d -p 5901:5900  --link hub:selenium 
+                                          selenium/node-chrome-debug
+
+3 docker run --name firefox -d -p 5902:5900 --link hub:selenium 
+                                          selenium/node-firefox-debug
+
+4 The above 2 containers are GUI containers and we can access their
+  GUI using VNC viewer
+  a) Download and install vnc viewer from
+     https://www.realvnc.com/en/connect/download/viewer/
+  b) Open vnc viewer--->Enter public ip of dockerhost:5901 (and) 5902
+     Click on Continue and enter password as "secret"
+
+======================================================================
+Day 8
+======================================================================
+
+Docker compose
+This is used to create a multi container architecture using yaml files
+The main advantage is reusability
+
+Installing docker compose
+Open https://docs.docker.com/compose/install/
+Click on Linux section
+Copy and paste the commands
+
+Create a docker compose file to setup the mysql wordpress container
+architecture
+vim docker-compose.yml
+---
+version: '3'
+services:
+ mydb:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD: intelliqit
+
+ mywordpress:
+  image: wordpress
+  ports:
+   - 8888:80
+  links:
+   - mydb:mysql
+...
+
+To setup the architecture from the above file
+docker-compose up -d
+
+To stop the containers 
+docker-compose stop
+
+To stop and delete
+docker-compose down
+
+==================================================================
+Create a docker compose file for setting up ghost and wordpress architecture
+vim docker-compose.yml
+---
+version: '3'
+services:
+ mydb:
+  image: mysql:5
+  environment:
+   MYSLQ_ROOT_PASSWORD: intelliqit
+ ghost:
+  image: ghost
+  ports:
+   - 9090:2368
+  links:
+   - mydb:mysql
+...
+
+==============================================================================
+Create a docker compose file to setup CI-CD environemnt where
+a jenkins container should be linked with 2 tomcat containers
+one for qaserver and other for prodserver
+vim docker-compose.yml
+
+---
+version: '3'
+services:
+ jenkinsserver:
+  image: jenkins
+  ports:
+   - 5050:8080
+
+ qaserver:
+  image: tomcat
+  ports:
+   - 6060:8080
+  links:
+   - jenkinsserver:jenkins
+
+ prodserver:
+  image: tomcat
+  ports:
+   - 7070:8080
+  links:
+   - jenkinsserver:jenkins
+
+=========================================================================
+Create a docker compose file to setup the LAMP architecture
+vim docker-compose.yml
+
+---
+version: '3'
+services:
+ mydb:
+  image: mysql
+  environment:
+   MYSQL_ROOT_PASSWORD: intelliqit
+ apache:
+  image: httpd
+  ports:
+   - 8989:80
+
+ php:
+  image: php:7.2-apache
+========================================================================
+Day 9
+========================================================================
+
+Docker compose file to setup the testing environment where a selenium
+hub container is linked with 2 node containers..one for chrome and
+other for firefox
+
+vim docker-compose.yml
+---
+version: '3'
+
+services:
+ hub:
+  image: selenium/hub
+  ports:
+   - 4444:4444
+
+ chrome:
+  image: selenium/node-chrome-debug
+  ports:
+   - 5901:5900
+  links:
+   - hub:selenium
+
+ firefox:
+  image: selenium/node-firefox-debug
+  ports:
+   - 5902:5900
+  links:
+   - hub:selenium
+...
+
+========================================================================
+Docker volumes
+======================
+================================================================
+Containers are ephemeral but the data processed by a container
+should be persistent.To achive this we can use volumes
+A volume is an external device or an external directory
+whcih is mounted on a container in such a way that even after
+the container is delete the mounted volume data will be present
+
+Docker uses 3 types of volumes
+1 Simple docker volume
+2 Sharable docker volumes
+3 Docker volume container
+
+Simple docker volume
+----------------------
+This is used only for preserving the data even though the 
+container is deleted
+
+==================================================================
+Day 9
+===================================================================
+UseCase
+-----------
+Create a directory /data on the host machine
+Create an ubuntu container and mount this /data
+as a volume on this contianer.Create some files in this mounted
+volume and check if the files are still available on the host
+machine even when the container is deleted
+
+1 Create a directory /data
+  mkdir /data
+
+2 Create an ubuntu container and mount /data as a volume
+  docker run --name u1 -it -v /data ubuntu
+
+3 In the ubuntu u1 container go into data folder(mounted volume)
+  and create some files
+  cd data
+  touch file1 file2
+  exit
+
+4 Indentify the mounted locations
+  docker inspect u1
+  Go to "Mounts" sections and copy the "Source" path
+  
+5 Delete the container
+  docker rm -f u1
+
+6 Check if the data is still present on host machine
+  cd "Source_path_from_step4"
+  ls
+
+
+
+
+Sharables Volumes
+=======================
+These volumes can be shared betwen multiple containers
+and the changes done by one container will be reflected
+to all other containers
+
+UseCase
+===========
+Create a folder /data on the dockerhost.mount it as a volume on
+centos container c1,later create another centos container c2
+and this c2 should use the volume used by c1,create another
+centos container c3 and this should use the volume used by c2
+Delete all three containers and check if the data is still present 
+on the host machine
+
+1 Create /data folder
+  mkdir /data
+
+2 Start centos as a container and mount /data as a volume 
+  docker run --name c1 -it -v /data centos
+
+3 In the centos c1 container go into the volume and create files
+  cd data
+  touch file1 file2
+  Come out of the container without exit (ctrl+p,ctrl+q)
+
+4 Create another centos container c2 and this container should use
+  the volume used by c1
+  docker run --name c2 -it --volumes-from c1 centos
+
+5 In the centos c2 container go into the volume and create files
+  cd data
+  touch file3 file4
+  Come out of the container without exit (ctrl+p,ctrl+q)
+
+6 Create another centos container c3 and this container should use
+  the volume used by c2
+  docker run --name c3 -it --volumes-from c2 centos
+
+7 In the centos c3 container go into the volume and create files
+  cd data
+  touch file5 file6
+  Come out of the container without exit (ctrl+p,ctrl+q)
+
+8 Go into any of the 3 containers and we should see all the files
+  docker attach c1 (or) c2 (or) c3
+  ls
+  exit
+
+9 Identify the mounted location
+  docker inspect c1
+  Go to "Mounts" section and copy the "Source" path
+
+10 Delete all the 3 containers
+   docker rm -f c1 c2 c3
+
+11 Check if the files are still available on the host machine
+   cd "source path coped from step 9"
+   ls
+
+
+============================================================================
+Day 10
+=============================================================================
+=========================================================================
+Docker volume containers
+==============================
+These are by directional volumes ie the files from the
+host can be accessed in the container and the files from the
+container can be accesed on the host
+
+UseCase
+----------------
+Create a volume "myvolume",Create some files in this volume
+and attach it to a centos container.In the centos container
+check if this data is available.Similary create some files
+in the volume in the container and check if these files are
+available on the host
+
+1 Create a docker volume
+  docker volume create myvolume
+
+2 Identify the volume location
+  docker volume inspect myvolume
+  Copy the MountPoint path
+
+3 Go to this mountpoint and create some files
+  cd MountPoint_path_from_step2
+  touch file1
+
+4 Create a centos container and mount the volume on /tmp folder in the container
+  docker run  --name c1 -it -v myvolume:/tmp centos
+
+5 Go into the tmp folder in the container and check if the files from host
+  are available
+  cd tmp
+  ls
+  
+6  Create few files
+   touch file2 file3
+  exit
+
+7 Delete the centos container
+  docker rm -f c1
+
+8 Check if the data is still present
+  cd MountPoint_path_from_step2
+  ls
+
+================================================================================
+
+Creating customised docker images
+====================================
+This can be done in 2 ways
+1) Using the docker commit command
+2) Using Dockerfile
+
+Using the commit command
+----------------------------
+UseCase
+-----------
+Create a ubuntu container and install git in it,Save this container as
+an image and create a new container from thsi newly created image
+We should see that git is already present
+
+1 Create a ubuntu container
+  docker run  --name c1 -it ubuntu
+
+2 Update the apt repository and install git and maven
+  apt-get  update
+  apt-get install -y git maven
+  git --version
+  mvn --version
+  exit
+
+3 Save the container as an image
+  docker commit u1 myubuntu
+
+4 Delete the ubuntu container
+  docker rm -f u1
+
+5 Check if a new image is created
+  docker images
+
+6 Create a new container from the above new image and check  of git,maven is present
+  docker run  --name u1 -it myubuntu
+  git --version
+  mvn --version
+
+
+Important keywords in dockerfile
+========================================
+1 FROM : This represents the base docker image on which we want
+to create customised docker images
+
+2 MAINTAINER : This is used to specify the name of the author or the
+organization that has created this dockerfile
+
+3  CMD : This is used to run a command or application in a container
+   from outside the container
+
+4 ENTRYPOINT : Every docker container triggers a default process
+  and this instruction is used to define that default process
+
+5 COPY : Used to copy files from host to container
+
+6 ADD : This can also copy files from dockerhost to container it can also
+  download files from a remote server
+
+7 USER : Used to specify who is the default user to login into the container
+
+8 VOLUME : This is used for automatic volume mounting ie when we start a container
+  it should be attached to a volume
+
+9 EXPOSE : This is used to specify what port should be opened in the container
+           ie internal port
+
+10 WORKDIR : Used to specify the defult directory which becomes the present
+   working dir in the container
+
+11 STOPSIGNAL : Used to specify the key sequence that can be used to stop the    container
+
+12 LABEL: Used to store info about the container in key value pairs.This is
+   generally used to store metadata about the container
+
+13 ARGS : Used to pass external arguments to container
+
+14 SHELL : Used to specify the default shell of the container,Eg: bash,ksh,sh
+
+15 RUN : This is used to run linux commands in the container
+    genrally used for s/w package management
+
+==============================================================================
+Day 11
+===============================================================================
+Create a dockerfile from centos base image and install git in it
+
+1 vim dockerfile
+
+FROM centos
+MAINTAINER intelliqit
+RUN yum -y update
+RUN yum install -y git
+
+2 To build an image from the above dockerfile
+  docker build -t mycentos .
+
+3 Check if a new image called mycentos is created
+  docker images
+
+4 Create a container from the above image and check if git is installed
+  docker run --name c1 -it mycentos
+  git --version
+
+==================================================================
+Cache Busting
+===================
+Whenever we create an image from a dockerfile docker stores all
+the executed instructions in the "dockercache",next time if we
+make modifications to the dockerfile and rebuild a new image
+docker reads all the previously executed instructions from the '
+dockercache and it will execute only the new instructions
+This is a time saving machanism provided by docker
+
+Eg:
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install -y git
+
+If we create an image from the above dockerfile it save all these instructions
+in the dockecache and alter if we add the below statement
+RUN apt-get install -y tree
+and if we build an image from this docker file it will execute on the 
+latest instruction
+
+The disadvantage is if we edit the docker file after a huge timegap
+then we can end up installing s/w from a reposiotry that was updated 
+log time back
+
+To overcome this we can use "cache busting" ie we can tell docker
+to build an image from the dockerfile without reading previosuly
+executed instructions from the dockercache
+
+docker build --no-cache -t myubuntu .
+
+====================================================================
+Create a dockerfile from ubuntu base image and mount /data
+as the default volume
+
+1 vim dockerfile
+FROM ubuntu
+MAINTAINER intelliqit
+VOLUME /data
+
+2 Create an image from the above dockerfile
+  docker build -t myubuntu .
+
+3 Create a container from the above image
+  docker run --name u1 -it myubuntu
+
+4 Go into the mounted volume and create few file
+  cd data
+  touch file1 file2
+  exit
+
+5 Check the mounted location
+  docker inspect u1
+  Go to "Mounts" section and copy the "Source" path
+
+6 Delete the container
+  docker rm -f u1
+
+7 Check if the data is still present on the host machine
+  cd "Source_path_from_step5"
+  ls
+
+==================================================================
+Day 11
+===================================================================
+Create a dockerfile from nginx base image and expose 90 as
+the container port
+
+1 vim dockerfile
+FROM nginx
+MAINTAINER intelliqit
+EXPOSE 90
+
+2 To build an image from the above dockerfile
+  docker build -t mynginx .
+
+3 Create a container from the above image
+  docker run --name n1 -d -P mynginx
+
+4 Check the port of the container
+  docker port n1
+
+==============================================================================
+Day 12
+==============================================================================
+Create a dockerfile from jenkins base image and make the deafult user
+as root and also install git amd maven
+
+1 vim dockerfile
+
+FROM jenkins
+MAINTAINER intelliqit
+USER root
+RUN apt-get update
+RUN apt-get install -y git maven
+
+2 Create an image from the above file
+  docker build -t myjenkins .
+
+3 Create a container from the above image
+  docker run --name j1 -d -P myjenkins
+
+4 Go into the bash shell of the container and check who is the 
+  default user and also check if the git and maven are present
+  docker exec -it j1 bash
+  whoami
+  git --version
+  mvn --version
+
+
+
+Create a dockerfile from ubuntu base image and download
+jenkins.war into it
+
+1 vim dockerfile
+  FROM ubuntu
+  MAINTAINER intelliqit
+  ADD  http://mirrors.jenkins.io/war-stable/2.235.3/jenkins.war  /
+
+2 Build an image from the above dockerfile
+  docker build -t myubuntu .
+
+3 Create a container from the above image and we should see jenkins.war in it
+  docker run  --name u1 -it myubuntu
+  ls
+
+===============================================================================
+Create a shell script to start 5 jenkins containers
+
+1 vim script1.sh
+for i in {1..5}
+do
+  docker run  --name j$i -d -P jenkins
+  
+done
+
+2 Give execute permisssions on that script
+  chmod u+x script1.sh
+
+3 Execute the shell script
+  ./script1.sh
+
+4 Check if 5 jenkins containers are running
+  docker container ls
+
+=========================================================================
+Create a dockerfile from  ubuntu base image and copy a file from host
+
+1 Create a file on host 
+  vim file1
+  Some data
+
+2 vim dockerfile
+  FROM  ubuntu
+  MAINTAINER intelliqit
+  COPY file /tmp
+
+
+3 Create an image from the above dockerfile
+  docker build -t ubuntu1 .
+
+4 Create a container from this image and we should see file1 in tmp folder
+  docker run  --name u1 -it ubuntu1
+  cd tmp
+  ls
+
+
+========================================================================
+Day 13
+======================================================================
+Create a dockerfile from ubuntu dockerimage and install java in
+it and download jenkins.war.
+When we start the contaienr it shoudl execute
+java -jar jenkins.war as the default process
+
+1 vim dockerfile
+FROM ubuntu
+MAINTAINER intelliqit
+RUN apt-get update
+RUN apt-get install -y openjdk-8-jdk
+ADD http://mirrors.jenkins.io/war-stable/latest/jenkins.war /
+ENTRYPOINT ["java","-jar","jenkins.war"]
+EXPOSE 8080
+
+2 Create an image from the dockerfile
+  docker build -t myubuntu .
+
+3 Create a container and check if jenkins is running
+  docker run  --name u1 -it myubuntu
+  This will generate the logs of jenkins
+
+4 To access the jenkins from the brpwser
+  public_ip_of_dockerhost:8080
+
+=============================================================================
+Create a dockerfile from centos base image and install
+httpd in it.Copy index.html into this and make httpd as the
+default process of the container
+
+1 vim index.html
+<html>
+ <body>
+         <h1>Welcome to IntelliQIt</h1>
+  </body>
+</html>
+
+2 vim dockerfile
+FROM centos
+MAINTAINER intelliqit
+RUN yum -y update
+RUN yum install -y httpd
+COPY index.html /var/www/html
+ENTRYPOINT ["/usr/sbin/httpd","-D","FOREGROUND"]
+EXPOSE 80
+
+3 Create an image from the above file
+  docker build -t mycentos .
+
+4 Create a container from the above image
+  docker run --name c1 -d -P mycentos
+
+5 Check if we can access this container from browser
+  public_ip_dockerhost:port_no_from_step4
+
+============================================================================
+Create a dockerfile from ubuntu image and make it behave
+like an nginx container
+
+1 vim dockerfile
+FROM ubuntu
+MAINTAINER intelliqit
+RUN apt-get update
+RUN apt-get install -y nginx
+ENTRYPOINT ["/usr/sbin/nginx","-g","daemon off;"]
+EXPOSE 80
+
+2 Create an image from the above dockerfile
+  docker build -t myubuntu .
+
+3 Create a container a from the above image
+  docker run --name c1 -d -P myubuntu
+
+4 to access the nginx from browser
+  public_ip_dockerhost:port_no_from_step3
+
+===============================================================================
+Day 14
+================================================================================
+Create a dockerfile from ubuntu base image and install ansible
+in it
+
+1 vim dockerfile
+FROM ubuntu
+MAINTAINER intelliqit
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN apt-get install -y ansible
+
+2 Create an image from the above file
+  docker build -t ansible .
+
+3 Create a container from above image and check if ansible is present
+  docker run --name a1 -it ansible
+  ansible --version
+
+===========================================================================
+
+Docker Networking
+=====================
+Docker uses 4 types os networks
+1 Bridge: This is the deafult network of docker when contianers are
+          running on a single docker host
+
+2 Host: This is used when we want to run a single container on a dockerhost
+         and this contianer communicates only with the host machine
+
+3 Null: This is used for creating isolated containers ie these containers
+        cannot communicate with th host machine or with other containers
+
+4 Overlay: This is used when containers are running in a distributed environment
+           on multiple linux servers
+
+
+UseCase
+===============
+Create 2 bridge networks intelliq1 and intelliq2
+Create 2 busybox containers c1,c2 and c3
+c1 and c2 should run on intelliq1 network and shoul ping each other
+c3 should run on intelliq2 network and it should not be able to ping c1 or c2
+Now put c2 on intelliq2 network,since c2 is on both intelliq1 and intelliq2
+networks it should be able to ping to both c1 and c3
+but c1 and c3 should not ping each other directly
+
+1 Create 2 bridge networks
+  docker network create --driver bridge intelliq1
+  docker network create --driver bridge intelliq2
+
+2 Check the list of available networks
+  docker network ls
+
+3 Create a busybox container c1 on intelliqi1 network
+  docker run --name c1 -it --network intelliq1 busybox
+  Come out of the c1 container without exit ctrl+p,ctrl+q
+
+4 Identify the ipaddress of c1
+  docker inspect c1
+
+5 Create another busybox container c2 on intelliq1 network
+  docker run --name c2 -it --network intelliq1 busybox
+  ping ipaddress_of_c1    (It will ping)
+  Come out of the c2 container without exit ctrl+p,ctrl+q
+
+6 Identify the ipaddress of c2
+  docker inspect c2
+
+7 Create another busybox container c3 on intelliq2 network
+  docker run --name c3 -it --network intelliq2 busybox
+  ping ipaddress_of_c1  (It should not ping)
+  ping ipaddress_of_c2  (It should not ping)
+  Come out of the c3 container without exit ctrl+p,ctrl+q
+
+8 Identify the ipaddress of c3
+  docker inspect c3 
+
+9 Now attach intelliq2 network to c2 container
+  docker network connect intelliq2 c2
+
+10 Since c2 is now on both intelliq1 and intelliq2 networks it should ping
+   to both c1 and c3 containers
+   docker attach c2
+   ping ipaddress_of_c1  (It should  ping)
+   ping ipaddress_of_c3  (It should  ping)
+   Come out of the c2 container without exit ctrl+p,ctrl+q
+
+11 But c1 and c3 should not ping each other
+   docker attach c3
+   ping ipaddress_of_c1  (It should not ping)
+
+
+Command to create a bridge network with a specific subnet
+docker network create  --driver bridge --subnet=192.168.2.0/25 intelliq3
+
+============================================================================
+Day 15
+============================================================================
+UseCase
+=============
+Create a bridge network on a specific subnet range
+Create docker compose file to start a postgres db and adminer
+webapplication on the network that we created
+
+1 Create a new network
+  docker network create --driver bridge --subnet=192.168.2.0/24 new_intelliqit
+
+2 Create a dcoker compose file
+vim docker-compose.yml
+---
+version: '3.8'
+
+services:
+ db:
+  image: postgres
+  environment:
+   POSTGRES_PASSWORD: intelliqit
+   POSTGRES_USER: user1
+   POSTGRES_DB: mydb
+
+ adminer:
+  image: adminer
+  ports:
+   - 8888:8080
+
+networks:
+ default:
+  external:
+   name: new_intelliqit
+
+3 To create services from the above dockerfile
+  docker compose up -d
+
+4 Check if the adminer can access the db from browser
+  public_ip_of_dockerhost:8888
+
+5 Check the ipaddress of the containers 
+  docker container ls
+  docker insepct container_id_from_above_command
+
+============================================================================
+Container Orchestration
+===========================
+This is the process of running docker containers in a distributed
+environment on multiple linux servers
+
+Advantages
+=================
+1 Load Balancing: The services can be deployed on multiple containers
+running on multiple servers so that the load can be distributed between
+containers and servers.On all these containers we can have only one
+service running
+
+2 Scalling: Depending on the business requirement we can increase or
+decrease the number of containers on which a specific service is running
+without the end users experiencing any downtime
+
+3 Rolling update: Services running on docker in a production environment
+can be upgraded to a higher version or rolled back to a lower version
+without the end users experiencing downtime.This is done by upgrading
+one container after other in a rolling manner
+
+4 High Availability/Disaster Recovery: If a container fails or the server
+on which these containers are running crashes still we can maintian
+the "desired number" of containers on the remaining servers.
+
+Popular tool for container orchestration
+===============================================
+1 Docker Swarm
+2 Kubernetes
+3 OpenShift
+4 Apache Mesos
+5 AWS ECS
+=============================================================
+Day 16
+=============================================================
+Setup of Docker Swarm
+===========================
+1 Create 3 AWS ubuntu instances
+2 Name them as Manager,Worker1 and Worker2
+3 Install docker on all of them
+4 Change the hostname
+  vim /etc/hostname
+  Delete the content of the file and replace it with
+  Manager/Worker1/Worker2
+5 Restart the AWS instances
+  init 6
+
+6 Connect to Manager 
+  docker swarm init
+  This will convert the current server as a Manager and it will generate the
+token id for workers to join the swarm
+7 Copy the token id and execute  in Worker machines
+8 To see the list of machines
+  docker node ls
+
+Note: Each machine used in swarm is called as node and the collection
+of all these nodes is called as Swarm cluster.
+
+Ports used by swarm
+-------------------------------
+TCP port 2376 for secure Docker client communication. This port is required for Docker Machine to work. Docker Machine is used to orchestrate Docker hosts.
+
+TCP port 2377. This port is used for communication between the nodes of a Docker Swarm or cluster. It only needs to be opened on manager nodes.
+
+TCP and UDP port 7946 for communication among nodes (container network discovery).
+UDP port 4789 for overlay network traffic (container ingress networking).
+
+==============================================================================
+LoadBalancing:
+-------------------
+UseCase-1
+Create nginx with 4 replicas in docker swarm cluster
+docker service create --name webserver -p 8989:80 --replicas 4 nginx
+
+To see on which node these replicas are running
+docker service ps webserver
+
+To access nginx from the level of browser
+public_ip_of_manager/Worker1/Worker2:8989
+
+============================================================================
+UseCase-2
+Create mysql with 3 replicas
+docker service create  --name db -e MYSQL_ROOT_PASSWORD=intelliqit mysql:5
+
+To check where these replicas are running
+docker service ps db
+
+To delete the mysql db service
+docker service rm db
+
+To see the list of services available
+docker service ls
+=========================================================================
+Scalling
+UseCase 1
+Create tomcat with 3 replicas and increase it to 8 
+later scale down to 2
+
+1 Create tomcat with 3 replicas
+  docker service create  --name appserver -p 9999:8080 --replicas 3 tomcat
+
+2 To check if 3 replicas of tomcat are running
+  docker service ps appserver
+
+3 To scale the replicas count from 3 to 8
+  docker service scale appserver=8
+
+4 Check if 8 replicas of tomcat are running
+  docker service ps appserver
+
+5 To scale the replicas count to 2
+  docker service scale appserver=2
+
+6 Check if 2 replicas are now running
+  docker service ps appserver
+
+
+======================================================================
+Day 17
+======================================================================
+Rolling updates
+---------------------
+Create redis:3 with 5 replicas and perform a rolling update to
+redis:4,later rollback to redis:3
+
+1 Create redis:3 with 5 replicas
+  docker service create  --name myredis --replicas 5 redis:3
+
+2 Check if 5 replicas of redis:3 are running
+  docker service ps myredis
+
+3 Perform a rolling update to redis:4
+  docker service update --image redis:4 myredis
+
+4 Check if redis:3 replicas are shut down and redis:4 replicas are running
+  docker service ps myredis
+
+5 Perform a rollback operation to redis:3 version
+  docker  service update --rollback myredis
+
+=========================================================================
+
+1 To remove a node from swarm via Manager
+  docker node update --availability drain node_name 
+  Eg: For Worker1 to leave the swarm
+  docker node update --availability drain Worker1
+
+2 To make Worker1 rejoin docker swarm
+  docker node update --availability active Worker1
+
+3 Workers can also leave swarm
+  a) Connect to Worker2 using git bash
+     docker swarm leave
+  b) On Manager check the status of nodes
+     docker node ls
+     It will show worker2 as "Down"
+  c) To remove this Worker2 from the cluster
+     docker node rm Worker2
+
+4 Manager cam leave swarm
+  docker swarm leave --force
+
+5 To generate the token id to a machine to join swarm as worker
+  docker swarm join-token worker
+
+6 To generate the token id to a machine to join swarm as manager
+  docker swarm join-token manager
+
+7 To promote Worker1 as manager
+  docker node promote Worker1
+
+8 To demote a Worker1 from manager to worker
+  docker node demote Worker1
+
+
+
+
+
+
+======================================================================
+FailOver Scnenarios of Workers
+================================
+Create httpd with 6 replicas and delete one replica running on the manager
+Check if all 6 replicas are still running
+
+Drain Worker1 from the docker swarm and check if all 6 replicas are running
+on Manager and Worker2,make Worker1 rejoin the swarm
+
+Make Worker2 leave the swarm and check if all the 6 replicas are
+running on Manager and Worker1
+
+1 Create httpd with 6 replicas
+  docker service create  --name webserver -p 9090:80 --replicas 6 httpd
+
+2 Check the replicas running on Manager
+  docker service ps webserver | grep Manager
+
+3 Check the container id
+  docker container ls
+
+4 Delete a replica
+  docker rm -f container_id_from_step3
+
+5 Check if all 6 replicas are running
+  docker service ps webserver
+
+6 Drain Worker1 from the swarm
+  docker node update --availability drain Worker1
+
+7 Check if all 6 replicas are still running on Manager and Worker2
+  docker service ps webserver
+
+8 Make Worker1 rejoin the swarm
+  docker node update --availability active Worker1
+
+9 Make Worker2 leave the swarm
+  Connect to Worker2 using git bash
+  docker swarm leave
+  Connect to Manager
+  
+10 Check if all 6 replicas are still running
+   docker service ps webserver
+
+=========================================================================
+Day 18
+========================================================================
+FailOver Scenarios of Managers
+====================================
+If a worker instance crashses all the replicas running on that
+worker will be moved to the Manager or the other workers.
+If the Manager itself crashes the swarm becomes headless 
+ie we cannot perfrom container orchestration activites in this
+swamr cluster
+
+To avoid this we should maintain multiple managers
+Manager nodes have the status as Leader or Reachable
+
+If one manager node goes down other manager becomes the Leader
+Quorum is resonsible for doing this activity and if uses a RAFT
+algorithm for handling the failovers of managers.Quorum also 
+is responsible for mainting the min number of manager
+
+Min count of manager required for docker swarm should be always
+more than half of the total count of Managers
+
+Total Manager Count  -    Min Manager Required
+      1              -           1
+      2              -           2
+      3              -           2
+      4              -           3
+      5              -           3
+      6              -           4
+      7              -           4
+
+Though having multiple manager is good to handle fail over scenarios
+of Manager it generally slows down the speed of the orchestration
+activiites as Quorum has to take approval from all the Manager
+to perfrom an orchestration activity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+============================================
+Day 16
+=============================================
+Overlay network
+==================
+This is the deafult network used by docker swarm
+and it perfroms network load balancing
+ie even if donot have a replica running on a specific node
+still we will be able to access that replica service via that node
+
+UseCase
+=============
+Create 2 custom overlay networks intelliq1 intelliq2
+Create htttpd as a service in swarm on the intelliq1 network
+Create tomcat as a service in swarm on the default overlay (ingres) 
+network and later perform a rolling network update to intelliq2 network
+
+1 Create 2 overlay networks
+  docker network create --driver overlay intelliq1
+  docker network create --driver overlay intelliq2
+
+2 Check if 2 new networks are create
+  docker network ls
+
+3 Start httpd with 5 replicas on intelliq1 network
+  docker service create --name webserver -p 8888:80 --replicas 5
+                                           --network intelliq1 httpd
+
+
+4 Check if httpd is running on intelliq1 network
+  docker service inspect webserver
+  This command generates the output in JSON file format 
+  To get the above output in simple text format
+  docker service inspect webserver  --pretty
+
+5 Start tomcat with 5 replcias on the defult ingres network
+  docker service create --name appserver -p 9090:8080 --replicas 5 tomcat
+
+6 Perfrom a rolling network update to intelliq2 network
+  docker service update --network-add intelliq2 appserver
+
+7 Check if tomcat in now running on intelliq2 network
+  docker service inspect appserver  --pretty
+
+Note: To remove a service from a  network
+  docker service update --network-rm network_name service_name
+
+
+=================================================================================
+Day 19
+=================================================================================
+
+
+Docker Stack
+====================
+This is used for creating a multi container architecture using
+docker compose and deploy it in the swarm cluster
+
+docker compose + swarm = docker stack
+docker compose + kubernetes = kompose
+
+1 To see the list of stacks
+  docker stack ls
+
+2 To create a stack
+  docker stack deploy -c stack_filename/docker_compose_file  stack_name
+
+3 To see the list of nodes where the stack services are running
+  docker stack ps stack_name
+
+4 To see the list of services in a stack
+  docker stack service stack_name
+
+5 To delete a stack
+  docker stack rm stack_name
+
+============================================================================
+Create a docker stack file for wordpress and mysql
+1 vim stack1.yml
+---
+version: '3'
+
+services:
+ mydb:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD: intelliq
+
+ mywordpress:
+  image: wordpress
+  ports:
+   - 5050:80
+  deploy:
+   replicas: 3
+...
+
+2 To deploy this stack service
+  docker stack deploy -c stack1.yml wordpress
+
+3 To see where the  stack replicas are running
+  docker stack ps wordpress
+
+4 To remove the entire stack
+  docker stack rm wordpress
+
+==========================================================================
+Create a stack file where 2 replicas of jenkins
+3 replicas of tomcat as qaserver and 4 replicas of tomcat
+as prodserver,
+jenkins replicas should run only on manager
+tomcat qaserver replicas only on worker1
+tomcat prodserver replicas only on worker2
+
+vim stack2.yml
+services:
+ jenkins:
+  image: jenkins
+  ports:
+   - 5050:8080
+  deploy:
+   replicas: 2
+   placement:
+    constraints:
+     - node.hostname == Manager
+
+ qaserver:
+  image: tomcat
+  ports:
+   - 6060:8080
+  deploy:
+   replicas: 3
+   placement:
+    constraints:
+     - node.hostname == Worker1
+
+ prodserver:
+  image: tomcat
+  ports:
+   - 7070:8080
+  deploy:
+   replicas: 4
+   placement:
+    constraints:
+     - node.hostname == Worker2
+    
+
+To deploy the services in swarm
+docker stack deploy -c stack2.yml ci-cd
+
+To check if all the serivces are deployed accoring to constraints
+docker stack ps ci-cd0
+
+To delete the stack
+docker stack rm ci-cd
+
+==============================================================
+Day 17
+===============================================================
+
+
+
+
+UseCase
+===============
+Create a docker stack file to setup the selenium testing environment
+and also put an upper limit on the h/w allocation
+
+1 vim stack3.yml
+---
+version: '3'
+
+services:
+ hub:
+  image: selenium/hub
+  ports:
+   - 4444:4444
+  deploy:
+   replicas: 1
+   resources:
+    limits:
+     cpus: "0.1"
+     memory: "200M"
+
+ chrome:
+  image: selenium/node-chrome-debug
+  ports:
+   - 5901:5900
+  deploy:
+   replicas: 2
+   resources:
+    limits:
+     cpus: "0.01"
+     memory: "100M"
+
+ firefox:
+  image: selenium/node-firefox-debug
+  ports:
+   - 5902:5900
+  deploy:
+   replicas: 2
+   resources:
+    limits:
+     cpus: "0.01"
+     memory: "100M"
+
+2 To deploy the the services from the above stack file
+  docker stack deploy -c stack3.yml selenium
+
+
+====================================================================
+
+=====================================================================
+
+
+Docker Secrets
+==================
+This is  a feature of docker swarm using which we can pass encrypted
+data to replicas running in swarm cluster
+These secrets are creatred on the host machine and they can be accessed
+from the replicas but the content cannot be modified in
+the replicas
+
+1 To create a secret and pass some data into it
+  echo "Hello Intelliq" | docker secret create mysecret -
+
+2 Create an aline:redis with 3 replicas and make it access the secret data
+  docker service create --name myredis --replicas 3 --secret mysecret redis:alpine
+
+3 Capture the container id
+  docker container ls
+
+4 Check if the secret data is available in the container
+  docker exec -it container_id_from_step4  cat /run/secrets/mysecret
+
+===============================================================================
+Day 20
+======================================================
+Secrets can be added to already running services  in swarm in
+a rolling update fashion and also removed in a rolling rollback
+manner
+
+UseCase
+============
+Create httpd with 5 replicas and later add the secret to it
+also remove the secret
+
+1 Create httpd with 5 replicas
+  docker service create --name webserver -p 8989:80  httpd
+
+2 Add a secret in a rolling update manner
+  docker service update --secret-add mysecret webserver
+
+3 Check if the secret data is available
+  docker container ls
+  Select the container id of onew replica of httpd
+  docker exec -it container_id cat /run/secrets/mysecret
+
+4 To remove the secret in a rolling rollback manner
+  docker service update --secret-rm mysecret webserver
+====================================================================
+
+
+
+
+Day 18
+===================================================================
+Create a secret for mysql database password
+and pass it to the docker stack file
+
+1 Create a secret
+  echo "intelliqit" | docker secret create db_password -
+
+2 Check if the secret is created or not
+  docker secret ls
+
+3 Create a docker stack file to use the above secret
+vim stack5.yml
+---
+version: '3.1'
+services:
+ mydb:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
+  secrets:
+   - db_password
+
+ mywordpress:
+  image: wordpress
+  ports:
+   - 5555:80
+  deploy:
+   replicas: 3
+
+secrets:
+ db_password:
+  external: true
+...
+
+To deploy the stack services
+docker stack deploy -c stack5.yml wordpress
+
+To check where the replicas are running
+docker stack ps wordpress
+
+
+
+===============================================================
+Create 3 secrets for postgres user,password and db
+and pass them to the stack file
+
+1 Create secrets
+  echo "intelliqit" | docker secret create pg_password -
+  echo "myuser" | docker secret create pg_user -
+  echo "mydb" | docker secret create pg_db -
+
+2 Check if the secrets are created
+  docker secret ls
+
+3 Create the docker stack file to work on these secrets
+  vim stack6.yml
+---
+version: '3.1'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+      POSTGRES_USER_FILE: /run/secrets/pg_user
+      POSTGRES_DB_FILE: /run/secrets/pg_db
+    secrets:
+     - pg_password
+     - pg_user
+     - pg_db
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    deploy:
+     replicas: 2
+
+secrets:
+    pg_password:
+     external: true
+    pg_user:
+     external: true
+    pg_db:
+     external: true
+
+...
+
+================================================================================
+Day 21
+================================================================================
+Kubernetes
+======================
+
+Menions: This is an individual node used in kubernetes
+Combination of these minions is called as Kubernetes cluster
+
+Master is the main machine which triggers the container orchestraion
+It distributes the work load to the Slaves
+
+Slaves are the nodes that accept the work load from the master
+and handle activites load balancing,autoscalling,high availability etc
+
+kubeadm: This is an application that is responible for creating the 
+Master node and it also stores info about the salves
+
+kubeapi: This is an application that runs on the salves and it it
+accepts the instructions from kubeadm and executes them on the slaves
+
+kubectl: This is an application that triggers the kubernetes commands
+
+Kubernetes uses various of types of Object
+
+1 Pod: This is a layer of abstraction on top of a container.This is the samallest
+  object that kubernetes can work on.In the Pod we have a container.
+  The advantage of using a Pod is that kubectl commands will work on the Pod and the 
+  Pod communicates these instructions to the container.In this way we can use the
+  same  kubectl irresepective of which technology containers are in the Pod.
+
+===============================================================================
+Day 22
+==============================================================================
+
+2 Service: This is used for port mapping and network load balancing
+
+3 NameSpace: This is used for creating partitions in the cluster.Pods running
+ in a namespace cannot communicate with other pods running in other namespace
+
+4 Secrets: This is used for passing encrypted data to the Pods
+
+5 ReplicationController: This is used for managing multiple replicas of PODs
+and also perfroming saclling 
+
+6 ReplicaSet: This is similar to replicationcontroller but it is more advanced
+where features like selector can be implemented
+
+7 Deployment: This used for perfroming all activites that a Replicaset can do
+  it can also handle rolling update
+
+8 Volume: Used to preserve the data even when the pods are deleted
+
+Setup of Kubernetes
+===============================
+Free
+===========
+1 http://katakoda.com
+(or)
+2 http://playwithk8s.com
+
+Paid
+==============
+1 Signup for a Google cloud account
+2 Click on Menu icon on top right corner--->Click on Kubernetes Engine-->Clusters
+3 Click on Create cluster--->Click on Create
+
+===================================================================================1 to see the list of nodes in the Kubernetes cluster
+  kubectl get nodes
+
+2 To get info about the nodes along with ipaddress and docker version etc
+  kubectl get nodes -o wide
+
+3 To get detailed info about the nodes
+  kubectl describe nodes node_name
+
+==============================================================================
+Create nginx as a pod and name it webserver
+kubectl run --image nginx webserver
+
+To see the list of pods
+kubectl get pods
+
+To get  info about the pods along with ipaddress
+kubectl get pods -o wide
+
+To get detailed info about the pods
+kubeclt describe pods webserver
+
+================================================================================
+Create a mysql pod and also pass the necessary environment variables
+kubectl run --image mysql:5 db --env MYSQL_ROOT_PASSWORD=intelliqit
+
+Check if the pod is running
+kubectl get pods
+
+To delete the mysql pod
+kubectl delete pods db
+
+==============================================================================
+Kubernetes Definition file
+=================================
+Kubernetes performs container orchestration uisng certain definition
+file.These files are created using yml and they have 4 top level
+fields
+
+apiVersion:
+kind:
+metadata:
+spec:
+
+apiVersion: Every kubernetes object uses a specific Kubernetes code
+library that is called apiVersion.Only once this code library is imported
+we can start working on specific objects
+
+kind: This represents the type of Kubernetes object that we want to us
+      eg: Pod,Replicaset,Service etc
+
+metadata: Here we give a name to the Kubernetes object and also some
+          labels.These labels can be used later for performing group
+          activites
+
+spec: This is where we store info about the exact docker image,container name
+      environment varibales,port mapping etc
+
+
+Kind              apiVersion
+=================================
+Pod               v1
+Service           v1
+NameSpace         v1
+Secrets           v1
+ReplicationController v1
+ReplicaSet        apps/v1
+Deployment        apps/v1
+
+
+
+
+==============================================================================
+
+
+
+
+UseCase-1
+Create a pod definition file to start an nginx in a pod 
+name the pod as nginx-pod,name the container as webserver
+
+vim pod-defintion1.yml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: nginx-pod
+ labels:
+  author: intellqit
+  type: reverse-proxy
+spec:
+ containers:
+  - name: appserver
+    image: nginx
+...
+
+To create a pod from the above file
+kubectl create -f pod-defintion1.yml
+
+To see the list of pods
+kubectl get pods
+
+To see the pods along with the ipaddress and name of the slave where it is running
+kubectl get pods -o wide
+
+To delete the pods created from the above file
+kubectl delete -f pod-definition1.yml
+
+=======================================================================
+Day 23
+=========================================================================
+Create a pod defintion file to start a postgres container
+Name of the container should be mydb,pass the necssary environment
+variables,this container should run in a pod called postgres-pod
+and give the labels as author=intelliqit and type=database
+
+
+vim pod-definition2.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: postgres-pod
+ labels:
+  author: intelliqit
+  type: database
+spec:
+ containers:
+  - name: mydb
+    image: postgres
+    env:
+     - name: POSTGRES_PASSWORD
+       value: myintelliqit
+     - name: POSTGRES_USER
+       value: myuser
+     - name: POSTGRES_DB
+       value: mydb
+
+To create pods from the above defintion file
+kubectl create -f pod-defintion2.yml
+
+To delete the pods
+kubectl delete -f pod-definition2.yml
+
+
+
+========================================================================
+
+UseCase 3
+Create a pod defintion file to start a jenkins container in a pod
+called jenkins-pod,also perform port mapping to access the jenkins
+from a browser
+
+vim pod-definition3.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: jenkins-pod
+ labels:
+  author: intelliqit
+  type: ci-cd
+spec:
+ containers:
+  - name: myjenkins
+    image: jenkins
+    ports:
+     - containerPort: 8080
+       hostPort: 8080
+...
+
+To create pods from the above file
+kubectl create -f pod-defintion3.yml
+
+To see the list of pods along with nodes where they are running
+kubectl get nodes -o wide
+
+To get the external ip of the node
+kubectl get node -o wide
+
+To access then jenkins from browser
+external_ip_of_slavenode:8080
+
+=========================================================================
+
+ReplicationController
+=======================
+This is a high level Kubernets object that can be used for handling 
+multiple replicas of a Pod.Here we can perfrom Load Balancing
+and Scalling
+
+ReplicationController uses keys like "replicas,template" etc in the "spec" section
+In the template section we can give metadata related to the pod and also use
+another spec section where we can give containers information
+
+Create a replication controller for creating 3 replicas of httpd
+vim repilication-controller.yml
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+ name: httpd-rc
+ labels:
+  author: intelliqit
+spec:
+ replicas: 3
+ template:
+  metadata:
+   name: httpd-pod
+   labels:
+    author: intelliqit
+  spec:
+   containers:
+    - name: myhttpd
+      image: httpd
+      ports:
+       - containerPort: 80
+         hostPort: 8080
+
+To create the httpd replicas from the above file
+kubectl create -f replication-controller.yml
+
+To check if 3 pods are running an on whcih slaves they are running
+kubectl get pods -o wide
+
+To delete the replicas
+kubectl delete -f replication-controller.yml
+
+=============================================================================
+Day 24
+=============================================================================
+ReplicaSet
+===================
+This is also similar to ReplicationController but it is more
+advanced and it can also handle load balancing and scalling
+It has an additional field in spec section called as "selector"
+This selector uses a child element "matchLabels" where the
+it will search for Pod based on a specific label name and try to add
+them to the cluster
+
+Create a replicaset file to start 4 tomcat replicas  and then perform scalling
+vim replica-set.yml
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: tomcat-rs
+ labels:
+  type: webserver
+  author: intelliqit
+spec:
+ replicas: 6
+ selector:
+  matchLabels:
+   type: webserver
+ template:
+  metadata:
+   name: tomcat-pod
+   labels:
+    type: webserver
+  spec:
+   containers:
+    - name: mywebserver
+      image: tomcat
+      ports:
+       - containerPort: 8080
+         hostPort: 9090
+
+To create the pods from the above file
+kubectl create -f replica-set.yml
+
+Scalling can be done in 2 ways
+a) Update the file and later scale it
+b) Scale from the coomand prompt withbout updating the defintion file
+
+a) Update the file and later scale it
+  Open the replicas-set.yml file and increase the replicas count from 4 to 6
+  kubectl replace -f replicas-set.yml
+  Check if 6 pods of tomcat are running
+  kubectl get pods
+
+b) Scale from the coomand prompt withbout updating the defintion file
+   kubectl scale --replicas=2 -f replica-set.yml
+
+
+Deployment
+================
+
+This is also a high level Kubernetes object which can be used for
+scalling and load balancing and it can also perfrom rolling update
+
+Create a deployment file to run nginx:1.7.9 with 3 replicas
+Later perform a rolling update to nginx:1.9.1
+
+vim deployment1.yml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: nginx-deployment
+ labels:
+  author: intelliqit
+  type: proxyserver
+spec:
+ replicas: 3
+ selector:
+  matchLabels:
+   type: proxyserver
+ template:
+  metadata:
+   name: nginx-pod
+   labels:
+    type: proxyserver
+  spec:
+   containers:
+    - name: nginx
+      image: nginx:1.7.9
+      ports:
+       - containerPort: 80
+         hostPort: 8888
+ 
+To create the deployment from the above file
+kubectl create -f deployment.yml
+
+To check if the deployment is running
+kubectl get deployment
+
+To see if all 3 pod of nginx are running
+kubectl get pod
+
+Check the version of nginx
+kubectl describe pods nginx-deployment | less       (nginx:1.7.9)
+
+Perform a rolling update to nginx:1.9.1
+kubectl --record deployment.apps/nginx-deployment set image                           deployment.v1.apps/nginx-deployment nginx=nginx:1.9.1
+
+To check if the update the has happened
+kubectl describe pods nginx-deployment | less      (nginx:1.9.1)
+
+
+==========================================================================
+Day 25
+==========================================================================
+
+Kompose
+================
+This is used to implement docker compose to create a multi
+container architecture in Kubernetes
+
+Implementing docker compose can be done using Kompose
+docker compose + docker swarm = docker stack
+docker compose + Kubernetes = Kompose
+
+Setup
+===========
+1 Download Kompose
+  curl -L https://github.com/kubernetes/kompose/releases/download/v1.18.0/kompose-linux-amd64 -o kompose
+
+2 Give execute permissions
+  chmod +x kompose
+
+3 Move it to PATH
+  sudo mv ./kompose /usr/local/bin/kompose
+
+4 To check if the installion is successfull
+  kompose version
+
+Digital Ocean URL
+========================
+https://www.digitalocean.com/community/tutorials/how-to-migrate-a-docker-compose-workflow-to-kubernetes
+
+vim docker-compose.yml
+---
+version: '3'
+services:
+ db:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD: intelliqit
+
+ wordpress:
+  image: wordpress
+  ports:
+   - 5050:80
+  deploy:
+   replicas: 3
+
+To start the services 
+kompose up
+
+To see the list of Pods
+kubectl get pods
+
+To see the list of all the kubernetes object created
+kubectl get all
+
+To convert the docker compose file into kubernetes 
+kompose convert
+
+To remove the services
+kompose down
+
+
+
+
+
+
+
+
+
+
+
+
+=========================================================================
+
+Service Object
+=====================
+
+This is used for network load balancing and port mapping
+It uses 3 ports
+1 target port:  Pod or container port
+2 port:   Service port
+3 hostPort:  Host machines port to make it accessable from external network
+
+Service objects are classified into 3 types
+1 clusterIP: This is the default type of service object used in
+  Kubernetes and it is used when we want the Pods in the cluster to
+  communicate with each other and not with extrnal networks
+
+2 nodePort: This is used if we want to access the pods from an extrnal
+  network and it also performs network load balancing ie even if a pod
+  is running on a specific salve we can access it from other slave in
+  the cluster
+
+3 LoadBalancer: This is similar to Nodeport and it is used for external 
+  connectivity of a Pod and also network load balancing and it also assigns
+  a public ip for all the slave combined together
+
+
+Use Case
+=================
+Create a service defintion file for port mapping an nginx pod
+
+vim pod-defintion1.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: nginx-pod
+ labels:
+  author: intellqit
+  type: reverse-proxy
+spec:
+ containers:
+  - name: appserver
+    image: nginx
+=========================================================
+vim service1.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: nginx-service
+spec:
+ type: NodePort
+ ports:
+  - targetPort: 80
+    port: 80
+    nodePort: 30008
+ selector:
+  author: intellqit
+  type: reverse-proxy
+
+Create pods from the above pod definition file
+kubectl create -f pod-definition1.yml
+Create the service from the above service definition file
+kubectl create -f service.yml
+Now nginx can be accesed from any of the slave
+kubectl get nodes -o wide
+Take the external ip of any of the nodes:30008
+
+============================================================================
+Day 26
+============================================================================
+=======================================================================
+Kubernetes Project
+========================
+This is a python based application which is used for accepting a vote
+(voting app).This application accepts the vote and passes it to a
+temporary db created using redis.From here the data is passed to a
+worker application created using .net which anlysises the data and
+stores them permananatly in a database created using postgres
+From here the results can be seen on an application that is created 
+using nodejs and this is called as resulta-app
+
+To do this we will create 5 pod definition files
+and 4 service files,2 services of type cluster ip for redis and postgres 
+databases 2 services of type loadbalancer for python voting app and 
+nodejs result app
+
+Pod Definition Files
+================================
+vim voting-app-pod.yml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: voting-app-pod
+  labels:
+    name: voting-app-pod
+    app: demo-voting-app
+spec:
+  containers:
+    - name: voting-app
+      image: dockersamples/examplevotingapp_vote
+      ports:
+        - containerPort: 80
+...
+
+
+vim result-app-pod.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: result-app-pod
+  labels:
+    name: result-app-pod
+    app: demo-voting-app
+spec:
+  containers:
+    - name: result-app
+      image: dockersamples/examplevotingapp_result
+      ports:
+        - containerPort: 80
+...
+
+
+vim worker-app-pod.yml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: worker-app-pod
+  labels:
+    name: worker-app-pod
+    app: demo-voting-app
+spec:
+  containers:
+    - name: worker-app
+      image: dockersamples/examplevotingapp_worker
+...
+
+
+vim redis-pod.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+  labels:
+    name: redis-pod
+    app: demo-voting-app
+spec:
+  containers:
+   - name: redis
+     image: redis
+     ports:
+       - containerPort: 6379
+...
+
+vim postgres-pod.yml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-pod
+  labels:
+    name: postgres-pod
+    app: demo-voting-app
+spec:
+  containers:
+    - name: postgres
+      image: postgres
+      ports:
+        - containerPort: 5432
+...
+
+==========================================================================
+Day 27
+============================================================================
+Service Defintion file
+===============================
+vim redis-service.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  labels:
+    name: redis-service
+    app: demo-voting-app
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    name: redis-pod
+    app: demo-voting-app
+...
+
+vim pod-service.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    name: postgres-service
+    app: demo-voting-app
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    name: postgres-pod
+    app: demo-voting-app
+...
+
+Note: Since "type" is not specified in the "spec" section they  will
+be created as clusterIP
+
+vim voting-app-service.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voting-app-service
+  labels:
+    name: voting-app-service
+    app: demo-voting-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    name: voting-app-pod
+    app: demo-voting-app
+...
+
+vim result-app-service.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result-app-service
+  labels:
+    name: result-app-service
+    app: demo-voting-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    name: result-app-pod
+    app: demo-voting-app
+...
+
+The above 2 service objects are created as LoadBalancer type ie
+they can perfrom network load balancing where we can access the pod
+from any slave and also a single public ip will be assigned for all
+the salves
+
+
+==============================================================================
+Day 28
+==============================================================================
+
+To deploy the above project using docker stack
+vim voting-app.yml
+---
+version: '3'
+
+services:
+ voting-app:
+  image: dockersamples/examplevotingapp_vote
+  ports:
+   - 6060:80
+
+ redis:
+  image: redis
+  ports:
+   - 6379:6379
+
+ worker-app:
+  image: dockersamples/examplevotingapp_worker
+
+ postgres:
+  image: postgres
+  environment:
+   POSTGRES_PASSWORD: intelliqit
+  ports:
+   - 5432:5432
+
+ result-app:
+  image: dockersamples/examplevotingapp_result
+  ports:
+   - 7070:80
+
+
+To deploy the above services
+docker stack deploy -c voting-app.yml my-voting-app
+
+
+To see the list of nodes where the stack services are running
+docker stack ps my-voting-app
+
+============================================================================
+To deploy the above file in kubernetes using kompose
+
+kompose up
+
+===============================================================================
+
+Namespace in kubernetes
+==========================
+To create Namespaces
+
+===========
+vim namespace.yml
+
+apiVersion: v1
+
+  kind: Namespace
+
+  metadata:
+
+    name: test-ns
+
+kubectl apply -f namespace.yaml 
+
+
+To see the list of namespace
+
+================================
+
+kubectl get namespace
+
+
+Create a pod on that namespace
+
+===================================
+vim pod-definition4.yml
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: httpd-pod
+
+  namespace: test-ns
+
+  labels:
+
+     app: httpd-pod
+
+spec:
+
+  containers:
+
+  - name: webserver
+
+    image: httpd
+
+
+
+To see list of pods in a namespace
+
+======================================
+
+kubectl get pods -n test-ns
+
+
+
+To delete a namespace
+
+===========================
+
+kubectl delete namespace test-ns
+
+
+==============================================================================
+Day 29
+==============================================================================
+
+Setup of Kubernetes Manually
+=================================================
+Install, start and enable docker service
+---------------------------------------------
+
+yum install -y -q yum-utils device-mapper-persistent-data lvm2 > /dev/null 2>&1
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo > /dev/null 2>&1
+yum install -y -q docker-ce >/dev/null 2>&1
+
+
+systemctl start docker
+systemctl enable docker
+
+=====================================================================================
+Disable SELINUX
+-----------------------
+setenforce 0
+sed -i --follow-symlinks 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
+
+===================================================================================
+Disable SWAP
+---------------------
+
+sed -i '/swap/d' /etc/fstab
+swapoff -a
+
+===================================================================================
+Update sysctl settings for Kubernetes networking
+-----------------------------------------------------
+cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+
+=====================================================================================
+Add Kubernetes to yum repository
+-------------------------------------------------
+
+cat >>/etc/yum.repos.d/kubernetes.repo<<EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+
+==================================================================================
+Install Kubernetes
+----------------------------
+yum install -y kubeadm kubelet kubectl
+
+==================================================================================
+Enable and start Kubernetes service
+---------------------------------------------
+
+systemctl start kubelet
+systemctl enable kubelet
+=====================================================================================
+Repeat the above steps on Master and slaves
+=====================================================================================
+
+===========
+On Master=============
+===========
+Initilise the Kubernetes cluster as root user
+-----------------------------------------
+
+kubeadm init --apiserver-advertise-address=ip_of_master  --pod-network-cidr=192.168.0.0/16
+
+====================================================================================
+As Non root users on Master
+============================
+
+To be able to use kubectl command to connect and interact with the cluster, 
+the user needs kube config file.
+
+mkdir /home/centos/.kube
+cp /etc/kubernetes/admin.conf /home/centos/.kube/config
+chown -R centos:centos /home/centos/.kube
+
+========================================================================================
+Deploy calico network
+kubectl create -f https://docs.projectcalico.org/v3.9/manifests/calico.yaml
+
+========================================================================================
+For slaves to join the cluster
+kubeadm token create --print-join-command
+
+======================================================================================
+Check the pods of kube-system  are running
+
+kubectl get pods -n kube-system
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+   
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
